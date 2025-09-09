@@ -1,0 +1,13 @@
+[versions]
+paper-api = "1.21.8-R0.1-SNAPSHOT"
+shadow = "8.1.8"
+paperweight-userdev = "2.0.0-beta.17"
+adventure = "4.24.0"
+
+[libraries]
+paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-api" }
+adventure = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+
+[plugins]
+shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
+paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }
