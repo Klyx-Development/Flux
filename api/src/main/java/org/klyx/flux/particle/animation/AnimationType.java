@@ -1,4 +1,4 @@
-package org.klyx.flux.data.particle.animation;
+package org.klyx.flux.particle.animation;
 
 public enum AnimationType {
     LINEAR, SPIRAL, WAVE, PULSE, RANDOM

@@ -1,6 +1,5 @@
 package org.klyx.flux.effects;
 
-import org.jetbrains.annotations.NotNull;
 import org.klyx.flux.utils.Vector3;
 
 import java.util.Collection;

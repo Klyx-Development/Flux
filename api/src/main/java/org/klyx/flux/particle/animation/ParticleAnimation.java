@@ -1,6 +1,6 @@
-package org.klyx.flux.data.particle.animation;
+package org.klyx.flux.particle.animation;
 
-import net.kyori.adventure.audience.Audience;
+import org.klyx.flux.utils.player.FluxPlayer;
 import org.klyx.flux.utils.Position;
 
 import java.util.Collection;
@@ -24,6 +24,6 @@ public interface ParticleAnimation {
     double getProgress(); // 0.0 -> 1.0
 
     AnimationSettings getSettings();
-    Collection<Audience> getViewers();
+    Collection<FluxPlayer> getViewers();
 
 }

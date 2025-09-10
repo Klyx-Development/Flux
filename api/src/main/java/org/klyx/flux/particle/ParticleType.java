@@ -1,12 +1,12 @@
-package org.klyx.flux.data.particle;
+package org.klyx.flux.particle;
 
 import net.kyori.adventure.key.Key;
-import org.klyx.flux.data.particle.data.BlockData;
-import org.klyx.flux.data.particle.data.DustOptions;
-import org.klyx.flux.data.particle.data.DustTransition;
-import org.klyx.flux.data.particle.data.ItemStack;
-import org.klyx.flux.data.particle.data.TrailOption;
-import org.klyx.flux.data.particle.data.VibrationOption;
+import org.klyx.flux.particle.data.BlockData;
+import org.klyx.flux.particle.data.DustOptions;
+import org.klyx.flux.particle.data.DustTransition;
+import org.klyx.flux.particle.data.ItemStack;
+import org.klyx.flux.particle.data.TrailOption;
+import org.klyx.flux.particle.data.VibrationOption;
 
 public enum ParticleType {
 

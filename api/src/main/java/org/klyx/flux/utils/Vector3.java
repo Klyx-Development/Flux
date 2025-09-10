@@ -49,19 +49,31 @@ public class Vector3 {
     }
 
     public Vector3 add(Vector3 otherVector) {
-        return new Vector3(x + otherVector.x(), y + otherVector.y(), z + otherVector.z());
+        x += otherVector.x();
+        y += otherVector.y();
+        z += otherVector.z();
+        return this;
     }
 
     public Vector3 subtract(Vector3 otherVector) {
-        return new Vector3(x - otherVector.x(), y - otherVector.y(), z - otherVector.z());
+        x -= otherVector.x();
+        y -= otherVector.y();
+        z -= otherVector.z();
+        return this;
     }
 
     public Vector3 multiply(double scalar) {
-        return new Vector3(x * scalar, y * scalar, z * scalar);
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+        return this;
     }
 
     public Vector3 divide(double scalar) {
-        return new Vector3(x / scalar, y / scalar, z / scalar);
+        x /= scalar;
+        y /= scalar;
+        z /= scalar;
+        return this;
     }
 
     public double length() {

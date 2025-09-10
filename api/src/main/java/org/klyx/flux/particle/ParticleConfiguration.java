@@ -1,4 +1,4 @@
-package org.klyx.flux.data.particle;
+package org.klyx.flux.particle;
 
 import org.jetbrains.annotations.Nullable;
 

@@ -1,8 +1,8 @@
 package org.klyx.flux.impl;
 
 import org.jetbrains.annotations.Nullable;
-import org.klyx.flux.data.particle.ParticleConfiguration;
-import org.klyx.flux.data.particle.ParticleType;
+import org.klyx.flux.particle.ParticleConfiguration;
+import org.klyx.flux.particle.ParticleType;
 
 public class DefaultParticleConfiguration implements ParticleConfiguration {
 

@@ -1,6 +1,6 @@
-package org.klyx.flux.data.particle.animation;
+package org.klyx.flux.particle.animation;
 
-import net.kyori.adventure.audience.Audience;
+import org.klyx.flux.utils.player.FluxPlayer;
 import org.klyx.flux.utils.Position;
 import org.klyx.flux.effects.EffectFormat;
 
@@ -12,7 +12,7 @@ public interface ParticleAnimator {
     ParticleAnimation createAnimation(EffectFormat format, AnimationSettings settings);
 
     ParticleAnimation startAnimation(EffectFormat format, Position position,
-                                     Collection<Audience> viewers, AnimationSettings settings);
+                                     Collection<FluxPlayer> viewers, AnimationSettings settings);
 
     void stopAnimations(UUID effectId);
 

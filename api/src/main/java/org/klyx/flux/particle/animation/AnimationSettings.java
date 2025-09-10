@@ -1,4 +1,4 @@
-package org.klyx.flux.data.particle.animation;
+package org.klyx.flux.particle.animation;
 
 public class AnimationSettings {
     private long durationMs = 1000;

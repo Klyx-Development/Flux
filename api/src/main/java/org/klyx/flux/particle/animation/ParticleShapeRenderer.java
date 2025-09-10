@@ -1,9 +1,9 @@
-package org.klyx.flux.data.particle.animation;
+package org.klyx.flux.particle.animation;
 
-import net.kyori.adventure.audience.Audience;
+import org.klyx.flux.utils.player.FluxPlayer;
 import org.klyx.flux.utils.Position;
-import org.klyx.flux.data.particle.ParticleConfiguration;
-import org.klyx.flux.data.particle.ParticleRenderer;
+import org.klyx.flux.particle.ParticleConfiguration;
+import org.klyx.flux.particle.ParticleRenderer;
 import org.klyx.flux.effects.EffectConfiguration;
 import org.klyx.flux.effects.EffectFormat;
 
@@ -19,11 +19,11 @@ public class ParticleShapeRenderer {
         this.animator = animator;
     }
 
-    public void render(EffectFormat format, Position position, Collection<Audience> viewers) {
+    public void render(EffectFormat format, Position position, Collection<FluxPlayer> viewers) {
         renderer.render(format, position, viewers);
     }
 
-    public ParticleAnimation animate(EffectFormat format, Position position, Collection<Audience> viewers,
+    public ParticleAnimation animate(EffectFormat format, Position position, Collection<FluxPlayer> viewers,
                                      long durationMs) {
         AnimationSettings settings = new AnimationSettings().setDurationMs(durationMs);
         return animator.startAnimation(format, position, viewers, settings);
@@ -35,7 +35,7 @@ public class ParticleShapeRenderer {
         private final ParticleAnimator animator;
 
         private Position position;
-        private Collection<Audience> viewers;
+        private Collection<FluxPlayer> viewers;
         private EffectConfiguration configuration;
         private ParticleConfiguration particleConfiguration;
         private AnimationSettings animationSettings;
@@ -51,7 +51,7 @@ public class ParticleShapeRenderer {
             return this;
         }
 
-        public RenderBuilder viewers(Collection<Audience> viewers) {
+        public RenderBuilder viewers(Collection<FluxPlayer> viewers) {
             this.viewers = viewers;
             return this;
         }
@@ -73,7 +73,7 @@ public class ParticleShapeRenderer {
 
         public void spawn() {
             if (configuration != null && particleConfiguration != null) {
-                renderer.render(format, configuration, particleConfiguration, position, viewers);
+                renderer.render(format.getPoints(), particleConfiguration, position, viewers);
             } else {
                 renderer.render(format, position, viewers);
             }
