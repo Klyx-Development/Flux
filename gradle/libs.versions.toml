@@ -1,13 +1,40 @@
 [versions]
-paper-api = "1.21.8-R0.1-SNAPSHOT"
-shadow = "8.1.8"
-paperweight-userdev = "2.0.0-beta.17"
-adventure = "4.24.0"
+paper-api = "26.2.build.+"
+shadow = "9.6.1"
+run-paper = "3.1.0"
+paperweight-userdev = "2.0.0-beta.21"
+jetbrains-annotations = "26.0.2"
+jspecify = "1.0.0"
+fastutil = "8.5.19"
+adventure = "4.26.1"
+joml = "1.10.8"
+slf4j = "2.0.18"
+gson = "2.13.1"
+exo = "3.1.4"
+junit = "5.13.4"
+jmh-plugin = "0.7.3"
+jmh = "1.37"
+assertj = "3.27.7"
 
 [libraries]
-paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-api" }
-adventure = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+fastutil = { module = "it.unimi.dsi:fastutil", version.ref = "fastutil" }
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+joml = { module = "org.joml:joml", version.ref = "joml" }
+exo-paper = { module = "org.klyx.exo:paper", version.ref = "exo" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
+jmh-processor = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
 [plugins]
-shadow = { id = "io.github.goooler.shadow", version.ref = "shadow" }
+jmh = { id = "me.champeau.jmh", version.ref = "jmh-plugin" }
+run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }

@@ -1,5 +1,3 @@
-rootProject.name = "Flux"
-
 pluginManagement {
     repositories {
         mavenCentral()
@@ -11,4 +9,10 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include("common", "api", "paper")
+rootProject.name = "Flux"
+
+include(":common")
+include(":platform-paper")
+project(":platform-paper").projectDir = file("platform/paper")
+include(":demo-paper")
+project(":demo-paper").projectDir = file("demo/paper")

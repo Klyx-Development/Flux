@@ -1,55 +1,30 @@
-plugins {
-    `java-library`
-    `maven-publish`
-    alias(libs.plugins.shadow)
-}
+val envFile: File = rootProject.file(".env")
+if (envFile.exists()) {
+    envFile.forEachLine { line ->
+        val trimmed = line.trim()
+        if (trimmed.isBlank() || trimmed.startsWith("#")) return@forEachLine
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
+        val parts = trimmed.split("=", limit = 2)
+        if (parts.size != 2) return@forEachLine
 
-java {
-    disableAutoTargetJvm()
-    toolchain.languageVersion = JavaLanguageVersion.of(21)
-}
+        val key = parts[0].trim()
+        val value = parts[1].trim()
 
-dependencies {
-}
-
-subprojects {
-    apply(plugin = "java")
-
-    repositories {
-        mavenCentral()
-    }
-
-    tasks.withType<JavaCompile> {
-        options.encoding = Charsets.UTF_8.name()
-        options.release.set(21)
-    }
-}
-
-group = "org.klyx"
-version = "1.0"
-description = "An easy to use Particle API for making any sorts of particle shapes you'd like."
-
-tasks {
-    jar {
-        enabled = false
-    }
-
-    shadowJar {
-        archiveFileName = "${rootProject.name}-${project.version}.jar"
-        archiveClassifier = null
-
-        manifest {
-            attributes["Implementation-Version"] = rootProject.version
+        if (!System.getenv().containsKey(key)) {
+            System.setProperty(key, value)
         }
     }
-
-    assemble {
-        dependsOn(shadowJar)
-    }
-
 }
+
+allprojects {
+    group = "org.klyx.flux"
+    version = "1.0"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven("https://repo.papermc.io/repository/maven-public/")
+    }
+}
+
+description = "Klyx's particle API"
