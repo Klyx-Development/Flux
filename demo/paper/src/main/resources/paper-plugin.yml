@@ -1,0 +1,6 @@
+name: FluxTest
+version: '0.1.0'
+main: org.klyx.fluxtest.FluxTest
+description: Test plugin for Flux, used to check out the effects and what Flux is capable of!
+authors: [ "Asleepp" ]
+api-version: '26.2'

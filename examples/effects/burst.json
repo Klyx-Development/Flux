@@ -1,0 +1,17 @@
+{
+  "description": "",
+  "duration": 2,
+  "tracks": {
+    "y": [ {"time": 0, "value": -1, "easing": "out_quad"}, {"time": 1.5, "value": 2} ],
+    "yaw": [ {"time": 0, "value": 0, "easing": "in_quad"}, {"time": 2, "value": 540} ]
+  },
+  "cues": [ {"time": 1.5, "name": "boom"} ],
+  "layers": [
+    {
+      "shape": {"type": "star", "points": 5, "outer": 1.2, "inner": 0.5},
+      "density": 6,
+      "shader": {"type": "solid", "color": "#FFEF3B"}
+    }
+  ],
+  "on_cue": { "boom": "burst_ring" }
+}

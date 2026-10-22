@@ -1,0 +1,16 @@
+{
+  "description": "a rainbow halo to wear on your head!",
+  "duration": 3,
+  "loop": "loop",
+  "tracks": {
+    "yaw": [ {"time": 0, "value": 0}, {"time": 3, "value": -360} ]
+  },
+  "layers": [
+    {
+      "shape": {"type": "torus", "major": 1.2, "minor": 0.15},
+      "style": "surface",
+      "density": 6,
+      "shader": {"type": "gradient", "colors": ["#FF3B3B", "#FFB03B", "#FFEF3B", "#3BFF6B", "#3BB8FF", "#A23BFF", "#FF3B3B"], "mode": "x", "phase": "query.progress"}
+    }
+  ]
+}

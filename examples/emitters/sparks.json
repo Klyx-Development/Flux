@@ -1,0 +1,18 @@
+{
+  "description": "",
+  "emitter": {
+    "rate": {"type": "steady", "per_second": 40},
+    "lifetime": {"type": "once", "active": 30},
+    "shape": {"type": "point"},
+    "direction": {"type": "cone", "axis": [0, 1, 0], "angle": 40},
+    "max_particles": 120
+  },
+  "particle": {
+    "lifetime": "1.5 + variable.particle_random_1",
+    "speed": 6,
+    "acceleration": [0, -14, 0],
+    "size": "0.1 * (1 - variable.particle_age / variable.particle_lifetime)",
+    "color": ["#FFFFFF", "#FFD23B", "#FF3B3B"],
+    "collision": {"restitution": 0.5}
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "description": "",
+  "emitter": {
+    "rate": {"type": "steady", "per_second": 60},
+    "lifetime": {"type": "once", "active": 30},
+    "shape": {"type": "disc", "radius": 0.2},
+    "direction": {"type": "cone", "axis": [0, 1, 0], "angle": 15},
+    "max_particles": 160
+  },
+  "particle": {
+    "lifetime": 1.7,
+    "speed": "5 + variable.particle_random_1 * 2",
+    "acceleration": [0, -9.8, 0],
+    "size": 0.12,
+    "color": ["#3B8CFF", "#FFFFFF"]
+  }
+}

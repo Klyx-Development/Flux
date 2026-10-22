@@ -1,0 +1,90 @@
+{
+  "format_version": "1.10.0",
+  "particle_effect": {
+    "description": {
+      "identifier": "flux:bubbles",
+      "basic_render_parameters": {
+        "material": "particles_alpha",
+        "texture": "textures/particle/particles"
+      }
+    },
+    "curves": {
+      "variable.pop": {
+        "type": "linear",
+        "input": "variable.particle_age / variable.particle_lifetime",
+        "nodes": [
+          0.3,
+          0.9,
+          1,
+          1.15,
+          0
+        ]
+      }
+    },
+    "components": {
+      "minecraft:emitter_rate_steady": {
+        "spawn_rate": 14,
+        "max_particles": 90
+      },
+      "minecraft:emitter_lifetime_expression": {
+        "activation_expression": 1
+      },
+      "minecraft:emitter_shape_box": {
+        "offset": [
+          0,
+          0.1,
+          0
+        ],
+        "half_dimensions": [
+          2.5,
+          0,
+          2.5
+        ],
+        "direction": [
+          0,
+          1,
+          0
+        ]
+      },
+      "minecraft:particle_lifetime_expression": {
+        "max_lifetime": "3.5 + variable.particle_random_1 * 2"
+      },
+      "minecraft:particle_initial_speed": 0.3,
+      "minecraft:particle_motion_dynamic": {
+        "linear_acceleration": [
+          "math.sin(variable.particle_age * 140 + variable.particle_random_2 * 360) * 0.6",
+          0.55,
+          "math.cos(variable.particle_age * 110 + variable.particle_random_3 * 360) * 0.6"
+        ],
+        "linear_drag_coefficient": 0.9
+      },
+      "minecraft:particle_appearance_billboard": {
+        "size": [
+          "(0.12 + variable.particle_random_4 * 0.18) * variable.pop",
+          "(0.12 + variable.particle_random_4 * 0.18) * variable.pop"
+        ],
+        "facing_camera_mode": "lookat_xyz",
+        "uv": {
+          "texture_width": 128,
+          "texture_height": 128,
+          "uv": [
+            0,
+            0
+          ],
+          "uv_size": [
+            8,
+            8
+          ]
+        }
+      },
+      "minecraft:particle_appearance_tinting": {
+        "color": [
+          "0.65 + variable.particle_random_2 * 0.2",
+          0.9,
+          1,
+          1
+        ]
+      }
+    }
+  }
+}

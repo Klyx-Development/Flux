@@ -1,0 +1,45 @@
+{
+  "description": "an example of an effect that uses another effect",
+  "duration": 2.1,
+  "loop": "loop",
+  "expressions": {
+    "scale": "1 + 0.25 * math.sin(query.time * 360 / 0.7)"
+  },
+  "cues": [
+    {
+      "time": 0,
+      "name": "first"
+    },
+    {
+      "time": 0.7,
+      "name": "second"
+    },
+    {
+      "time": 1.4,
+      "name": "third"
+    }
+  ],
+  "layers": [
+    {
+      "shape": {
+        "type": "sphere",
+        "radius": 0.3
+      },
+      "style": "surface",
+      "density": 5,
+      "shader": {
+        "type": "gradient",
+        "colors": [
+          "#FFFFFF",
+          "#7AD7FF"
+        ],
+        "mode": "y"
+      }
+    }
+  ],
+  "on_cue": {
+    "first": "ripple",
+    "second": "ripple",
+    "third": "ripple"
+  }
+}

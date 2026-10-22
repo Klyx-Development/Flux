@@ -1,0 +1,36 @@
+{
+  "description": "used by pulse_wave",
+  "duration": 1.6,
+  "tracks": {
+    "scale": [
+      {
+        "time": 0,
+        "value": 0.2,
+        "easing": "out_cubic"
+      },
+      {
+        "time": 1.6,
+        "value": 3.4
+      }
+    ]
+  },
+  "layers": [
+    {
+      "shape": {
+        "type": "circle",
+        "radius": 1
+      },
+      "density": 7,
+      "shader": {
+        "type": "gradient",
+        "colors": [
+          "#FFFFFF",
+          "#7AD7FF",
+          "#2B6BFF"
+        ],
+        "mode": "radial",
+        "phase": "query.progress * 0.99"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "description": "",
+  "duration": 3,
+  "loop": "loop",
+  "tracks": {
+    "yaw": [ {"time": 0, "value": 0}, {"time": 3, "value": 360} ]
+  },
+  "layers": [
+    {
+      "shape": {"type": "circle", "radius": 1.2},
+      "density": 5,
+      "interval": 0.2,
+      "particle": "flame"
+    }
+  ]
+}
