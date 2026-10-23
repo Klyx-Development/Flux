@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 public final class PaperPacketSender implements PacketSender<Packet<?>> {
-    public static final int MAX_PACKETS_PER_BUNDLE = 1024;
+    public static final int MAX_PACKETS_PER_BUNDLE = 128;
 
     private final Logger logger;
 

@@ -3,6 +3,7 @@ package org.klyx.flux.dispatch;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,6 +68,24 @@ public final class PacketDispatcher<P> {
         });
     }
 
+    public void scheduleLatest(UUID viewer, Map<Integer, P> packets) {
+        if (packets.isEmpty()) return;
+
+        Map<Integer, P> copy = Map.copyOf(packets);
+        this.hasWork = true;
+
+        this.executor.execute(() -> {
+            this.pending.addLatest(viewer, copy);
+            this.hasWork = true;
+        });
+    }
+
+    public void cancelLatest(UUID viewer, int[] keys) {
+        if (keys.length == 0) return;
+
+        this.executor.execute(() -> this.pending.cancelLatest(viewer, keys));
+    }
+
     public synchronized void start() {
         if (this.tickHandle != null) return;
 
@@ -114,7 +133,7 @@ public final class PacketDispatcher<P> {
     }
 
     public record Limits(int maxPacketsPerTick, int maxBacklog) {
-        public static final Limits DEFAULT = new Limits(1024, 16384);
+        public static final Limits DEFAULT = new Limits(2048, 16384);
 
         public Limits {
             if (maxPacketsPerTick < 1) throw new IllegalArgumentException("maxPacketsPerTick has to be positive");

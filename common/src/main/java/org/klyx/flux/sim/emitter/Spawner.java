@@ -45,9 +45,9 @@ public final class Spawner {
 
         if (slot < 0) return false;
 
-        this.emitter.shape().sample(this.random, this.offset);
         this.store.rollRandoms(slot, this.random);
         this.variables.loadParticle(this.store, slot, 0, 0, emitterAge);
+        this.emitter.shape().sample(this.random, this.variables, this.offset);
         this.emitter.direction().resolve(this.random, this.offset, this.variables, this.direction);
 
         double life = Numbers.finiteOr(this.particle.lifetime().eval(this.variables), 0);

@@ -1,6 +1,5 @@
 package org.klyx.flux.paper.display;
 
-import net.kyori.adventure.nbt.BinaryTag;
 import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.kyori.adventure.nbt.IntArrayBinaryTag;
 import net.kyori.adventure.nbt.IntBinaryTag;
@@ -26,19 +25,19 @@ public final class DisplayStyle {
     private final BillboardConstraints billboard;
     private final boolean emissive;
     private final float viewRange;
-    private final int glideTicks;
+    private final int interpolationTicks;
     private final String item;
     private final @Nullable String model;
     private final boolean tint;
     private final boolean fireworkTint;
     private final ExoEntityType entityType;
 
-    public DisplayStyle(ParticleSpec particle, int glideTicks) {
+    public DisplayStyle(ParticleSpec particle, int interpolationTicks) {
         this.kind = particle.kind();
         this.billboard = convert(particle.billboard());
         this.emissive = particle.emissive();
         this.viewRange = (float) particle.viewRange();
-        this.glideTicks = glideTicks;
+        this.interpolationTicks = interpolationTicks;
         this.item = particle.item();
         this.model = particle.model();
         this.tint = particle.tint();
@@ -70,8 +69,8 @@ public final class DisplayStyle {
         return this.viewRange;
     }
 
-    public int glideTicks() {
-        return this.glideTicks;
+    public int interpolationTicks() {
+        return this.interpolationTicks;
     }
 
     public ExoEntityType entityType() {

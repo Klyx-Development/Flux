@@ -42,7 +42,7 @@ public final class FluxPaper {
         renderer = new ParticleRenderer(created);
         followers = new EntityFollowers(plugin);
         effects = new PaperEffects(plugin, renderer, followers);
-        displayParticles = new DisplayParticles(plugin, followers);
+        displayParticles = new DisplayParticles(plugin, followers, created.dispatcher());
     }
 
     public static synchronized void destroy() {

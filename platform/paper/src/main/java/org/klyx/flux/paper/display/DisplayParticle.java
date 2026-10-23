@@ -2,6 +2,7 @@ package org.klyx.flux.paper.display;
 
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3;
@@ -11,11 +12,16 @@ import org.jspecify.annotations.Nullable;
 import org.klyx.exo.entity.LightweightExoEntity;
 import org.klyx.exo.entity.data.ExoEntityType;
 import org.klyx.exo.entity.meta.impl.AbstractEntityMeta;
+import org.klyx.exo.entity.meta.impl.MetaEntry;
 import org.klyx.exo.entity.meta.types.entity.display.DisplayMeta;
 import org.klyx.exo.entity.meta.types.entity.display.ItemDisplayMeta;
 import org.klyx.exo.entity.meta.types.entity.display.TextDisplayMeta;
+import org.klyx.exo.paper.entity.PaperEntityTypes;
+import org.klyx.exo.paper.meta.PaperMetaPackets;
 import org.klyx.flux.sim.EmitterView;
 import org.klyx.flux.sim.spec.DisplayKind;
+
+import java.util.List;
 
 public final class DisplayParticle extends LightweightExoEntity {
     private static final float TEXT_X = 8f;
@@ -47,8 +53,8 @@ public final class DisplayParticle extends LightweightExoEntity {
         this.meta.setBillboardConstraints(style.billboard());
         this.meta.setViewRange(style.viewRange());
         this.meta.setShadowRadius(0f);
-        this.meta.setTeleportDuration(style.glideTicks());
-        this.meta.setInterpolationDuration(style.glideTicks());
+        this.meta.setTeleportDuration(style.interpolationTicks());
+        this.meta.setInterpolationDuration(style.interpolationTicks());
         if (style.emissive()) this.meta.setBrightnessOverride(15);
     }
 
@@ -85,6 +91,30 @@ public final class DisplayParticle extends LightweightExoEntity {
         if (metaChanged) this.meta.setInterpolationDelay(0);
 
         return metaChanged;
+    }
+
+    public List<MetaEntry<?>> takeAll() {
+        List<MetaEntry<?>> entries = this.meta.toEntries();
+        this.meta.markSynced();
+
+        return entries;
+    }
+
+    public List<MetaEntry<?>> takeDirty() {
+        List<MetaEntry<?>> dirty = this.meta.dirtyEntries();
+        this.meta.markSynced();
+
+        return dirty;
+    }
+
+    public Packet<?> addPacket(double x, double y, double z) {
+        return new ClientboundAddEntityPacket(
+                entityId(), uuid(), x, y, z, 0f, 0f,
+                PaperEntityTypes.toNms(this.style.entityType()), 0, Vec3.ZERO, 0f);
+    }
+
+    public @Nullable Packet<?> dataPacket(List<MetaEntry<?>> entries, int protocolVersion) {
+        return PaperMetaPackets.toPacket(entityId(), entries, protocolVersion);
     }
 
     public Packet<?> positionPacket(double x, double y, double z) {

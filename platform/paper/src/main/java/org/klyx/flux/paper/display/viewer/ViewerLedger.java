@@ -1,7 +1,11 @@
 package org.klyx.flux.paper.display.viewer;
 
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import net.minecraft.network.protocol.Packet;
 import org.jspecify.annotations.Nullable;
+import org.klyx.flux.dispatch.PacketDispatcher;
 import org.klyx.flux.paper.display.DisplayParticle;
+import org.klyx.flux.paper.display.simulation.PacketOutbox;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -66,14 +70,20 @@ public final class ViewerLedger {
         }
     }
 
-    public static void despawnAll(UUID viewer, BitSet shown, DisplayParticle[] particles) {
-        List<UUID> single = List.of(viewer);
+    public static void despawnAll(
+            UUID viewer, BitSet shown, DisplayParticle[] particles, PacketDispatcher<Packet<?>> dispatcher
+    ) {
+        IntArrayList ids = new IntArrayList(shown.cardinality());
 
         for (int slot = shown.nextSetBit(0); slot >= 0; slot = shown.nextSetBit(slot + 1)) {
             DisplayParticle particle = particles[slot];
-            if (particle != null) particle.despawn(single);
+            if (particle != null) ids.add(particle.entityId());
         }
 
         shown.clear();
+        if (ids.isEmpty()) return;
+
+        dispatcher.cancelLatest(viewer, ids.toIntArray());
+        dispatcher.scheduleEssential(viewer, PacketOutbox.removals(ids));
     }
 }

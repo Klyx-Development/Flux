@@ -18,7 +18,7 @@ if (envFile.exists()) {
 
 allprojects {
     group = "org.klyx.flux"
-    version = "1.0"
+    version = "1.0.1"
 
     repositories {
         mavenLocal()

@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,6 +21,21 @@ public final class ViewerQueues<P> {
 
     public void addEssential(UUID viewer, List<P> packets) {
         this.pending.computeIfAbsent(viewer, _ -> new Queues<>()).essential.addAll(packets);
+    }
+
+    public void addLatest(UUID viewer, Map<Integer, P> packets) {
+        this.pending.computeIfAbsent(viewer, _ -> new Queues<>()).latest.putAll(packets);
+    }
+
+    public void cancelLatest(UUID viewer, int[] keys) {
+        Queues<P> queues = this.pending.get(viewer);
+        if (queues == null) return;
+
+        for (int key : keys) {
+            queues.latest.remove(key);
+        }
+
+        if (queues.isEmpty()) this.pending.remove(viewer);
     }
 
     public boolean isEmpty() {
@@ -57,6 +73,13 @@ public final class ViewerQueues<P> {
         List<P> batch = new ArrayList<>(Math.min(queues.essential.size() + queues.normal.size(), budget));
         while (batch.size() < budget && !queues.essential.isEmpty()) batch.add(queues.essential.pollFirst());
         while (batch.size() < budget && !queues.normal.isEmpty()) batch.add(queues.normal.pollFirst());
+
+        Iterator<P> latest = queues.latest.values().iterator();
+        while (batch.size() < budget && latest.hasNext()) {
+            batch.add(latest.next());
+            latest.remove();
+        }
+
         return batch;
     }
 
@@ -68,9 +91,10 @@ public final class ViewerQueues<P> {
     private static final class Queues<P> {
         private final ArrayDeque<P> essential = new ArrayDeque<>();
         private final ArrayDeque<P> normal = new ArrayDeque<>();
+        private final LinkedHashMap<Integer, P> latest = new LinkedHashMap<>();
 
         private boolean isEmpty() {
-            return this.essential.isEmpty() && this.normal.isEmpty();
+            return this.essential.isEmpty() && this.normal.isEmpty() && this.latest.isEmpty();
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.klyx.flux.paper.display;
 
+import net.minecraft.network.protocol.Packet;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -8,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jspecify.annotations.Nullable;
+import org.klyx.flux.dispatch.PacketDispatcher;
 import org.klyx.flux.effect.anchor.Anchor;
 import org.klyx.flux.effect.anchor.DynamicAnchor;
 import org.klyx.flux.math.Vec3;
@@ -34,14 +36,18 @@ public final class DisplayParticles {
     private final WorldBlockCache blocks = new WorldBlockCache();
     private final PlayerPositions playerPositions = new PlayerPositions();
     private final EntityFollowers followers;
+    private final PacketDispatcher<Packet<?>> dispatcher;
     private final Object taskLock = new Object();
     private @Nullable BukkitTask positionTask;
 
     private volatile boolean closed;
 
-    public DisplayParticles(JavaPlugin plugin, EntityFollowers followers) {
+    public DisplayParticles(
+            JavaPlugin plugin, EntityFollowers followers, PacketDispatcher<Packet<?>> dispatcher
+    ) {
         this.plugin = plugin;
         this.followers = followers;
+        this.dispatcher = dispatcher;
         this.runner = new SimulationRunner(plugin.getSLF4JLogger());
     }
 
@@ -94,7 +100,7 @@ public final class DisplayParticles {
         DisplayEmitter running = new DisplayEmitter(
                 emitter, particle, anchor,
                 new WorldViewerPositions(this.playerPositions, world),
-                DEFAULT_VIEW_DISTANCE, 2, null
+                this.dispatcher, DEFAULT_VIEW_DISTANCE, DisplayEmitter.INTERPOLATION_TICKS, null
         );
 
         if (particle.collision() != null) running.collider(this.blocks.colliderFor(world));

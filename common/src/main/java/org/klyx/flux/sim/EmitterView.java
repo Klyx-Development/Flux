@@ -5,10 +5,12 @@ public final class EmitterView {
     public static final int APPEARANCE = 2;
     public static final int COLOR = 4;
 
-    private static final double MOVE_EPSILON = 1.0 / 512;
-    private static final float SIZE_EPSILON = 1.0f / 1024;
-    private static final float ROLL_EPSILON = 0.1f;
+    private static final double MOVE_EPSILON = 1.0 / 128;
+    private static final float SIZE_EPSILON = 1.0f / 64;
+    private static final float ROLL_EPSILON = 1.0f;
 
+    private final int updateInterval;
+    private long tick;
     private final int[] shown;
     private final double[] sentX;
     private final double[] sentY;
@@ -18,7 +20,10 @@ public final class EmitterView {
     private final int[] sentRgb;
     private int shownCount;
 
-    public EmitterView(int capacity) {
+    public EmitterView(int capacity, int updateInterval) {
+        if (updateInterval < 1) throw new IllegalArgumentException("updateInterval has to be positive");
+
+        this.updateInterval = updateInterval;
         this.shown = new int[capacity];
         this.sentX = new double[capacity];
         this.sentY = new double[capacity];
@@ -37,6 +42,8 @@ public final class EmitterView {
     }
 
     public void sync(Emitter emitter, Listener listener) {
+        this.tick++;
+
         for (int slot = 0; slot < emitter.highWater(); slot++) {
             boolean alive = emitter.isAlive(slot);
             int generation = emitter.generation(slot);
@@ -51,6 +58,8 @@ public final class EmitterView {
                 show(emitter, slot, generation, listener);
                 continue;
             }
+
+            if ((this.tick + slot) % this.updateInterval != 0) continue;
 
             int changed = changedGroups(emitter, slot);
             if (changed == 0) continue;

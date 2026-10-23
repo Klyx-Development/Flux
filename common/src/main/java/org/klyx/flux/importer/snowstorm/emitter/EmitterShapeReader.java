@@ -1,6 +1,7 @@
 package org.klyx.flux.importer.snowstorm.emitter;
 
 import org.klyx.flux.blueprint.Node;
+import org.klyx.flux.expr.Expression;
 import org.klyx.flux.importer.snowstorm.reading.Reader;
 import org.klyx.flux.importer.snowstorm.reading.ReadingContext;
 import org.klyx.flux.importer.snowstorm.reading.Values;
@@ -63,25 +64,33 @@ public final class EmitterShapeReader implements Reader<ShapeResult> {
         return new ShapeResult(shape, direction, context.values().vector(node.child("offset"), Values.zeroVector()));
     }
 
-    private Vec3 planeNormal(ReadingContext context, Node disc) {
+    private List<Expression> planeNormal(ReadingContext context, Node disc) {
         Node node = disc.child("plane_normal");
-        if (node == null) return new Vec3(0, 1, 0);
+        if (node == null) return axis(0, 1, 0);
+
         if (node.isString()) {
             return switch (node.asString("").toLowerCase(Locale.ROOT)) {
-                case "x" -> new Vec3(1, 0, 0);
-                case "y" -> new Vec3(0, 1, 0);
-                case "z" -> new Vec3(0, 0, 1);
+                case "x" -> axis(1, 0, 0);
+                case "y" -> axis(0, 1, 0);
+                case "z" -> axis(0, 0, 1);
                 default -> {
                     node.error("\"" + node.asString("") + "\" isn't a plane. Use \"x\", \"y\", \"z\" or [x, y, z]");
-                    yield new Vec3(0, 1, 0);
+                    yield axis(0, 1, 0);
                 }
             };
         }
-        Vec3 normal = context.values().constantVector(disc, "plane_normal", new Vec3(0, 1, 0));
-        if (normal.equals(Vec3.ZERO)) {
+
+        List<Expression> normal = context.values().vector(node, axis(0, 1, 0));
+        if (normal.stream().allMatch(Expression::isConstant)
+                && normal.stream().allMatch(part -> part.evalConstant() == 0)) {
             node.error("a plane normal can't be [0, 0, 0]");
-            return new Vec3(0, 1, 0);
+            return axis(0, 1, 0);
         }
+
         return normal;
+    }
+
+    private static List<Expression> axis(double x, double y, double z) {
+        return List.of(Expression.constant(x), Expression.constant(y), Expression.constant(z));
     }
 }
