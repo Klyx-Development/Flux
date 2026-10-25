@@ -26,18 +26,20 @@ public final class DisplayStyle {
     private final boolean emissive;
     private final float viewRange;
     private final int interpolationTicks;
+    private final int moveTicks;
     private final String item;
     private final @Nullable String model;
     private final boolean tint;
     private final boolean fireworkTint;
     private final ExoEntityType entityType;
 
-    public DisplayStyle(ParticleSpec particle, int interpolationTicks) {
+    public DisplayStyle(ParticleSpec particle, int interpolationTicks, int moveTicks) {
         this.kind = particle.kind();
         this.billboard = convert(particle.billboard());
         this.emissive = particle.emissive();
         this.viewRange = (float) particle.viewRange();
         this.interpolationTicks = interpolationTicks;
+        this.moveTicks = moveTicks;
         this.item = particle.item();
         this.model = particle.model();
         this.tint = particle.tint();
@@ -71,6 +73,10 @@ public final class DisplayStyle {
 
     public int interpolationTicks() {
         return this.interpolationTicks;
+    }
+
+    public int moveTicks() {
+        return this.moveTicks;
     }
 
     public ExoEntityType entityType() {

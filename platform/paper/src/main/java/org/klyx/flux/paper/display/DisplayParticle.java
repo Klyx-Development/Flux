@@ -3,8 +3,6 @@ package org.klyx.flux.paper.display;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
-import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -32,6 +30,10 @@ public final class DisplayParticle extends LightweightExoEntity {
     private final @Nullable TextDisplayMeta text;
     private final @Nullable ItemDisplayMeta item;
 
+    private float size;
+    private float roll;
+    private int ramp;
+
     public DisplayParticle(DisplayStyle style) {
         this.style = style;
 
@@ -53,8 +55,9 @@ public final class DisplayParticle extends LightweightExoEntity {
         this.meta.setBillboardConstraints(style.billboard());
         this.meta.setViewRange(style.viewRange());
         this.meta.setShadowRadius(0f);
-        this.meta.setTeleportDuration(style.interpolationTicks());
+        this.meta.setTeleportDuration(style.moveTicks());
         this.meta.setInterpolationDuration(style.interpolationTicks());
+        this.ramp = style.interpolationTicks();
         if (style.emissive()) this.meta.setBrightnessOverride(15);
     }
 
@@ -70,15 +73,17 @@ public final class DisplayParticle extends LightweightExoEntity {
 
     public void reset(float size, float rollDegrees, int rgb) {
         this.meta.setInterpolationDelay(0);
+        applyRamp(this.style.interpolationTicks());
         applyAppearance(size, rollDegrees);
         applyColor(rgb);
     }
 
-    public boolean update(int changed, float size, float rollDegrees, int rgb) {
+    public boolean update(int changed, float size, float rollDegrees, int rgb, int rampTicks) {
         boolean metaChanged = false;
 
         if ((changed & EmitterView.APPEARANCE) != 0) {
             applyAppearance(size, rollDegrees);
+            applyRamp(rampTicks);
             metaChanged = true;
         }
 
@@ -88,7 +93,7 @@ public final class DisplayParticle extends LightweightExoEntity {
         }
 
         // setting this forces the metadata to be sent so only do it when something's really changed
-        if (metaChanged) this.meta.setInterpolationDelay(0);
+        if ((changed & EmitterView.APPEARANCE) != 0) this.meta.setInterpolationDelay(0);
 
         return metaChanged;
     }
@@ -98,6 +103,25 @@ public final class DisplayParticle extends LightweightExoEntity {
         this.meta.markSynced();
 
         return entries;
+    }
+
+    public List<MetaEntry<?>> snapshot(float size, float rollDegrees, int rampTicks) {
+        float keptSize = this.size;
+        float keptRoll = this.roll;
+        int keptRamp = this.ramp;
+
+        applyAppearance(size, rollDegrees);
+        applyRamp(rampTicks);
+        List<MetaEntry<?>> entries = this.meta.toEntries();
+
+        applyAppearance(keptSize, keptRoll);
+        applyRamp(keptRamp);
+
+        return entries;
+    }
+
+    public void markSynced() {
+        this.meta.markSynced();
     }
 
     public List<MetaEntry<?>> takeDirty() {
@@ -117,12 +141,15 @@ public final class DisplayParticle extends LightweightExoEntity {
         return PaperMetaPackets.toPacket(entityId(), entries, protocolVersion);
     }
 
-    public Packet<?> positionPacket(double x, double y, double z) {
-        PositionMoveRotation position = new PositionMoveRotation(new Vec3(x, y, z), Vec3.ZERO, 0f, 0f);
-        return new ClientboundEntityPositionSyncPacket(entityId(), position, false);
+    private void applyRamp(int ticks) {
+        this.ramp = ticks;
+        this.meta.setInterpolationDuration(ticks);
     }
 
     private void applyAppearance(float size, float rollDegrees) {
+        this.size = size;
+        this.roll = rollDegrees;
+
         if (this.text != null) {
             this.meta.setScale(new Vector3f(size * TEXT_X, size * TEXT_Y, 1f));
         } else {

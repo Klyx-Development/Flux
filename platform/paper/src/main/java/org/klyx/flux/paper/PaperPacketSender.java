@@ -1,5 +1,6 @@
 package org.klyx.flux.paper;
 
+import io.netty.channel.Channel;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBundlePacket;
@@ -32,6 +33,19 @@ public final class PaperPacketSender implements PacketSender<Packet<?>> {
         for (Packet<?> packet : bundle(packets)) {
             handle.connection.send(packet);
         }
+    }
+
+    @Override
+    public double congestion(UUID viewer) {
+        Player player = Bukkit.getPlayer(viewer);
+        if (player == null) return 0;
+
+        Channel channel = ((CraftPlayer) player).getHandle().connection.connection.channel;
+        long highWaterMark = channel.config().getWriteBufferHighWaterMark();
+        if (highWaterMark <= 0) return 0;
+
+        // if the channel becomes congested enough, reduce the amount of packets we send
+        return 1.0 - Math.min(1.0, (double) channel.bytesBeforeUnwritable() / highWaterMark);
     }
 
     @Override

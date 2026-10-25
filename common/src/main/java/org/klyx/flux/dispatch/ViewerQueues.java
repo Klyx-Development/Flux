@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 public final class ViewerQueues<P> {
     private final Map<UUID, Queues<P>> pending = new HashMap<>();
@@ -23,7 +25,7 @@ public final class ViewerQueues<P> {
         this.pending.computeIfAbsent(viewer, _ -> new Queues<>()).essential.addAll(packets);
     }
 
-    public void addLatest(UUID viewer, Map<Integer, P> packets) {
+    public void addLatest(UUID viewer, Map<Integer, Supplier<P>> packets) {
         this.pending.computeIfAbsent(viewer, _ -> new Queues<>()).latest.putAll(packets);
     }
 
@@ -55,12 +57,12 @@ public final class ViewerQueues<P> {
         }
     }
 
-    public void drain(int budget, BatchSink<P> sink) {
+    public void drain(int budget, ToIntFunction<UUID> optionalBudget, BatchSink<P> sink) {
         for (Iterator<Map.Entry<UUID, Queues<P>>> iterator = this.pending.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<UUID, Queues<P>> entry = iterator.next();
             Queues<P> queues = entry.getValue();
 
-            List<P> batch = takeBatch(queues, budget);
+            List<P> batch = takeBatch(queues, budget, Math.min(budget, optionalBudget.applyAsInt(entry.getKey())));
 
             if (queues.isEmpty()) iterator.remove();
             if (batch.isEmpty()) continue;
@@ -69,15 +71,22 @@ public final class ViewerQueues<P> {
         }
     }
 
-    private static <P> List<P> takeBatch(Queues<P> queues, int budget) {
+    private static <P> List<P> takeBatch(Queues<P> queues, int budget, int optionalBudget) {
         List<P> batch = new ArrayList<>(Math.min(queues.essential.size() + queues.normal.size(), budget));
         while (batch.size() < budget && !queues.essential.isEmpty()) batch.add(queues.essential.pollFirst());
-        while (batch.size() < budget && !queues.normal.isEmpty()) batch.add(queues.normal.pollFirst());
 
-        Iterator<P> latest = queues.latest.values().iterator();
-        while (batch.size() < budget && latest.hasNext()) {
-            batch.add(latest.next());
+        int limit = Math.min(budget, batch.size() + optionalBudget);
+        while (batch.size() < limit && !queues.normal.isEmpty()) {
+            batch.add(queues.normal.pollFirst());
+        }
+
+        Iterator<Supplier<P>> latest = queues.latest.values().iterator();
+        while (batch.size() < limit && latest.hasNext()) {
+            Supplier<P> next = latest.next();
             latest.remove();
+
+            P packet = next.get();
+            if (packet != null) batch.add(packet);
         }
 
         return batch;
@@ -91,7 +100,7 @@ public final class ViewerQueues<P> {
     private static final class Queues<P> {
         private final ArrayDeque<P> essential = new ArrayDeque<>();
         private final ArrayDeque<P> normal = new ArrayDeque<>();
-        private final LinkedHashMap<Integer, P> latest = new LinkedHashMap<>();
+        private final LinkedHashMap<Integer, Supplier<P>> latest = new LinkedHashMap<>();
 
         private boolean isEmpty() {
             return this.essential.isEmpty() && this.normal.isEmpty() && this.latest.isEmpty();

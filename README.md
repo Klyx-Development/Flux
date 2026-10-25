@@ -49,10 +49,10 @@ repositories {
 
 dependencies {
     // Common (required)
-    implementation("org.klyx.flux:common:1.0.1")
+    implementation("org.klyx.flux:common:1.0.2")
 
     // Paper
-    implementation("org.klyx.flux:paper:1.0.1")
+    implementation("org.klyx.flux:paper:1.0.2")
 }
 ```
 
@@ -62,14 +62,14 @@ dependencies {
 <dependency>
   <groupId>org.klyx.flux</groupId>
   <artifactId>common</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 
 <!-- Paper -->
 <dependency>
   <groupId>org.klyx.flux</groupId>
   <artifactId>paper</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 

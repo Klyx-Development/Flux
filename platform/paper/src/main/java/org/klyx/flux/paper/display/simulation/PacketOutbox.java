@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Determines everything that a tick wants to send to a viewer
@@ -23,7 +24,8 @@ public final class PacketOutbox {
     private final PacketDispatcher<Packet<?>> dispatcher;
     private final Map<UUID, IntArrayList> removals = new HashMap<>();
     private final Map<UUID, List<Packet<?>>> essential = new HashMap<>();
-    private final Map<UUID, Map<Integer, Packet<?>>> moves = new HashMap<>();
+    private final List<Runnable> afterSpawns = new ArrayList<>();
+    private final Map<UUID, Map<Integer, Supplier<Packet<?>>>> moves = new HashMap<>();
 
     public PacketOutbox(PacketDispatcher<Packet<?>> dispatcher) {
         this.dispatcher = dispatcher;
@@ -37,8 +39,12 @@ public final class PacketOutbox {
         this.essential.computeIfAbsent(viewer, _ -> new ArrayList<>()).add(packet);
     }
 
-    public void move(UUID viewer, int entityId, Packet<?> packet) {
+    public void move(UUID viewer, int entityId, Supplier<Packet<?>> packet) {
         this.moves.computeIfAbsent(viewer, _ -> new HashMap<>()).put(entityId, packet);
+    }
+
+    public void afterSpawns(Runnable task) {
+        this.afterSpawns.add(task);
     }
 
     public void flush() {
@@ -60,11 +66,13 @@ public final class PacketOutbox {
             this.dispatcher.scheduleEssential(viewer, ordered);
         }
 
+        this.afterSpawns.forEach(this.dispatcher::execute);
         this.moves.forEach(this.dispatcher::scheduleLatest);
 
         this.removals.clear();
         this.essential.clear();
         this.moves.clear();
+        this.afterSpawns.clear();
     }
 
     // the remove entity packet supports an array of entity ids, so lets use that to our advantage!

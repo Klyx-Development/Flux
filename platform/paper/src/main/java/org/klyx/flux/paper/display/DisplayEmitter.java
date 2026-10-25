@@ -28,6 +28,7 @@ import java.util.random.RandomGeneratorFactory;
 public final class DisplayEmitter implements Playback {
     public static final int UPDATE_INTERVAL = 2;
     public static final int INTERPOLATION_TICKS = UPDATE_INTERVAL + 1;
+    public static final int MOVE_TICKS = UPDATE_INTERVAL * 3;
 
     private final Emitter emitter;
     private final Anchor anchor;
@@ -54,11 +55,11 @@ public final class DisplayEmitter implements Playback {
         this.anchor = anchor;
         this.positions = positions;
         this.dispatcher = dispatcher;
-        this.style = new DisplayStyle(particle, interpolationTicks);
+        this.style = new DisplayStyle(particle, interpolationTicks, MOVE_TICKS);
         this.particles = new DisplayParticle[this.emitter.capacity()];
-        this.view = new EmitterView(this.emitter.capacity(), UPDATE_INTERVAL);
+        this.view = new EmitterView(this.emitter.capacity(), UPDATE_INTERVAL, MOVE_TICKS);
         this.ledger = new ViewerLedger(this.particles.length);
-        this.sent = new ViewerSent(this.particles.length);
+        this.sent = new ViewerSent(this.particles.length, dispatcher);
         this.selector = new ViewerSelector(
                 this.ledger, positions, anchor, maxViewDistance * maxViewDistance, this.particles, dispatcher,
                 this.sent);
@@ -144,7 +145,7 @@ public final class DisplayEmitter implements Playback {
         ViewerSelector.Selection selection = this.selector.select();
         PacketOutbox outbox = new PacketOutbox(this.dispatcher);
         SlotSync sync = new SlotSync(
-                this.emitter, this.particles, this.style, this.ledger, selection, this.sent, outbox);
+                this.emitter, this.view, this.particles, this.style, this.ledger, selection, this.sent, outbox);
 
         this.view.sync(this.emitter, sync);
         sync.spawnMissing();

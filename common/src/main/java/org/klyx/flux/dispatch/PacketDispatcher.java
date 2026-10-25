@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 public final class PacketDispatcher<P> {
 
@@ -68,16 +70,23 @@ public final class PacketDispatcher<P> {
         });
     }
 
-    public void scheduleLatest(UUID viewer, Map<Integer, P> packets) {
+    public void scheduleLatest(UUID viewer, Map<Integer, Supplier<P>> packets) {
         if (packets.isEmpty()) return;
 
-        Map<Integer, P> copy = Map.copyOf(packets);
+        Map<Integer, Supplier<P>> copy = Map.copyOf(packets);
         this.hasWork = true;
 
         this.executor.execute(() -> {
             this.pending.addLatest(viewer, copy);
             this.hasWork = true;
         });
+    }
+
+    public void execute(Runnable task) {
+        try {
+            this.executor.execute(task);
+        } catch (RejectedExecutionException ignored) {
+        }
     }
 
     public void cancelLatest(UUID viewer, int[] keys) {
@@ -120,8 +129,13 @@ public final class PacketDispatcher<P> {
     }
 
     private void drain() {
-        this.pending.drain(this.limits.maxPacketsPerTick(), this::send);
+        this.pending.drain(this.limits.maxPacketsPerTick(), this::budget, this::send);
         this.hasWork = !this.pending.isEmpty();
+    }
+
+    private int budget(UUID viewer) {
+        double congestion = Math.clamp(this.sender.congestion(viewer), 0.0, 1.0);
+        return (int) Math.round(this.limits.maxPacketsPerTick() * (1 - congestion));
     }
 
     private void send(UUID viewer, List<P> batch) {

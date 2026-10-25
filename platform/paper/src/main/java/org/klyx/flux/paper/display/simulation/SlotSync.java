@@ -18,6 +18,7 @@ import java.util.UUID;
 
 public final class SlotSync implements EmitterView.Listener {
     private final Emitter emitter;
+    private final EmitterView view;
     private final DisplayParticle[] particles;
     private final DisplayStyle style;
     private final ViewerLedger ledger;
@@ -27,10 +28,11 @@ public final class SlotSync implements EmitterView.Listener {
     private final PacketOutbox outbox;
 
     public SlotSync(
-            Emitter emitter, DisplayParticle[] particles, DisplayStyle style, ViewerLedger ledger,
+            Emitter emitter, EmitterView view, DisplayParticle[] particles, DisplayStyle style, ViewerLedger ledger,
             ViewerSelector.Selection selection, ViewerSent sent, PacketOutbox outbox
     ) {
         this.emitter = emitter;
+        this.view = view;
         this.particles = particles;
         this.style = style;
         this.ledger = ledger;
@@ -55,7 +57,8 @@ public final class SlotSync implements EmitterView.Listener {
     public void update(int slot, int changed) {
         DisplayParticle particle = this.particles[slot];
         boolean metaChanged = particle.update(
-                changed, this.emitter.size(slot), this.emitter.roll(slot), this.emitter.rgb(slot));
+                changed, this.view.targetSize(slot), this.view.targetRoll(slot), this.emitter.rgb(slot),
+                this.view.ramp(slot));
 
         List<UUID> showing = this.ledger.showing(this.active, slot);
         if (showing.isEmpty()) return;
@@ -90,28 +93,57 @@ public final class SlotSync implements EmitterView.Listener {
                 double x = this.emitter.x(slot);
                 double y = this.emitter.y(slot);
                 double z = this.emitter.z(slot);
+                int spawned = slot;
 
                 DisplayParticle particle = this.particles[slot];
                 this.outbox.essential(viewer, particle.addPacket(x, y, z));
 
-                Packet<?> data = particle.dataPacket(particle.takeAll(), version);
-                if (data != null) this.outbox.essential(viewer, data);
+                queueState(viewer, version, spawned, particle);
 
                 ViewerSent.record(sentTo, slot, x, y, z);
+                this.outbox.afterSpawns(() -> this.sent.place(viewer, spawned, x, y, z));
+                queueGlide(viewer, sentTo, slot, particle);
                 shown.set(slot);
             }
         }
+    }
+
+    private void queueState(UUID viewer, int version, int slot, DisplayParticle particle) {
+        queueData(viewer, version, particle, particle.snapshot(
+                this.view.displayedSize(slot), this.view.displayedRoll(slot), this.style.interpolationTicks()));
+
+        if (this.view.isRamping(slot)) {
+            queueData(viewer, version, particle, particle.snapshot(
+                    this.view.targetSize(slot), this.view.targetRoll(slot), this.view.remainingRamp(slot)));
+        }
+
+        particle.markSynced();
+    }
+
+    private void queueData(UUID viewer, int version, DisplayParticle particle, List<MetaEntry<?>> entries) {
+        Packet<?> data = particle.dataPacket(entries, version);
+        if (data != null) this.outbox.essential(viewer, data);
+    }
+
+    // a particle that's already moving needs to start gliding as soon as it appears
+    private void queueGlide(UUID viewer, double[] sentTo, int slot, DisplayParticle particle) {
+        if (!this.view.hasGlide(slot)) return;
+
+        double x = this.view.targetX(slot);
+        double y = this.view.targetY(slot);
+        double z = this.view.targetZ(slot);
+
+        ViewerSent.record(sentTo, slot, x, y, z);
+        this.outbox.move(viewer, particle.entityId(), this.sent.move(viewer, slot, particle.entityId(), x, y, z));
     }
 
     // checks against the last position sent rather than the previous tick
     // this allows flux to skip some movement and save a bit of bandwidth
     // when a viewer is far enough away to not notice a difference
     private void queueMoves(int slot, DisplayParticle particle) {
-        double x = this.emitter.x(slot);
-        double y = this.emitter.y(slot);
-        double z = this.emitter.z(slot);
-
-        Packet<?> move = null;
+        double x = this.view.targetX(slot);
+        double y = this.view.targetY(slot);
+        double z = this.view.targetZ(slot);
 
         for (int i = 0; i < this.active.size(); i++) {
             UUID viewer = this.active.get(i);
@@ -124,8 +156,7 @@ public final class SlotSync implements EmitterView.Listener {
 
             ViewerSent.record(sentTo, slot, x, y, z);
 
-            if (move == null) move = particle.positionPacket(x, y, z);
-            this.outbox.move(viewer, particle.entityId(), move);
+            this.outbox.move(viewer, particle.entityId(), this.sent.move(viewer, slot, particle.entityId(), x, y, z));
         }
     }
 
