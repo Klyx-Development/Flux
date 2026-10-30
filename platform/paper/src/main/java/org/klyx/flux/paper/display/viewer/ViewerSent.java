@@ -3,7 +3,9 @@ package org.klyx.flux.paper.display.viewer;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundEntityPositionSyncPacket;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+import net.minecraft.network.protocol.game.VecDelta;
 import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.PositionPath;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import org.klyx.flux.dispatch.PacketDispatcher;
@@ -72,11 +74,11 @@ public final class ViewerSent {
             positions[base + 2] = targetZ;
 
             if (fits(deltaX) && fits(deltaY) && fits(deltaZ)) {
-                return new ClientboundMoveEntityPacket.Pos(entityId, (short) deltaX, (short) deltaY, (short) deltaZ, false);
+                return new ClientboundMoveEntityPacket.Pos(entityId, new VecDelta.Linear((short) deltaX, (short) deltaY, (short) deltaZ), false);
             }
 
-            PositionMoveRotation position = new PositionMoveRotation(new Vec3(x, y, z), Vec3.ZERO, 0f, 0f);
-            return new ClientboundEntityPositionSyncPacket(entityId, position, false);
+            PositionPath positionPath = new PositionPath.Linear(new Vec3(x, y, z));
+            return new ClientboundEntityPositionSyncPacket(entityId, positionPath, 0f, 0f, false);
         };
     }
 

@@ -1,5 +1,5 @@
 [versions]
-paper-api = "26.2.build.+"
+paper-api = "26.3.build.+"
 shadow = "9.6.1"
 run-paper = "3.1.0"
 paperweight-userdev = "2.0.0-beta.21"
@@ -11,10 +11,6 @@ joml = "1.10.8"
 slf4j = "2.0.18"
 gson = "2.13.1"
 exo = "3.1.4"
-junit = "5.13.4"
-jmh-plugin = "0.7.3"
-jmh = "1.37"
-assertj = "3.27.7"
 
 [libraries]
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
@@ -26,15 +22,8 @@ joml = { module = "org.joml:joml", version.ref = "joml" }
 exo-paper = { module = "org.klyx.exo:paper", version.ref = "exo" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
-junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
-jmh-core = { module = "org.openjdk.jmh:jmh-core", version.ref = "jmh" }
-jmh-processor = { module = "org.openjdk.jmh:jmh-generator-annprocess", version.ref = "jmh" }
-assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 
 [plugins]
-jmh = { id = "me.champeau.jmh", version.ref = "jmh-plugin" }
 run-paper = { id = "xyz.jpenilla.run-paper", version.ref = "run-paper" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 paperweight-userdev = { id = "io.papermc.paperweight.userdev", version.ref = "paperweight-userdev" }

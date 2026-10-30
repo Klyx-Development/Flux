@@ -1,4 +1,4 @@
-package org.klyx.fluxtest.recipe;
+package org.klyx.flux.plugin.recipe;
 
 import org.klyx.flux.effect.AdvancedParticle;
 import org.klyx.flux.sim.spec.EmitterSpec;

@@ -1,10 +1,10 @@
-package org.klyx.fluxtest.recipe;
+package org.klyx.flux.plugin.recipe;
 
 import org.klyx.flux.blueprint.BlueprintRegistry;
-import org.klyx.fluxtest.recipe.impl.BobbersRecipe;
-import org.klyx.fluxtest.recipe.impl.BurstRecipe;
-import org.klyx.fluxtest.recipe.impl.CrownRecipe;
-import org.klyx.fluxtest.recipe.impl.StreamersRecipe;
+import org.klyx.flux.plugin.recipe.impl.BobbersRecipe;
+import org.klyx.flux.plugin.recipe.impl.BurstRecipe;
+import org.klyx.flux.plugin.recipe.impl.CrownRecipe;
+import org.klyx.flux.plugin.recipe.impl.StreamersRecipe;
 
 import java.util.Map;
 

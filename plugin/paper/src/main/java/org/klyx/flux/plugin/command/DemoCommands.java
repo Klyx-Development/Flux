@@ -1,7 +1,7 @@
-package org.klyx.fluxtest.command;
+package org.klyx.flux.plugin.command;
 
 import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -9,11 +9,11 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.klyx.flux.effect.playback.EffectInstance;
 import org.klyx.flux.effect.playback.Playback;
 import org.klyx.flux.paper.FluxPaper;
-import org.klyx.fluxtest.recipe.Recipe;
+import org.klyx.flux.plugin.recipe.Recipe;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -23,7 +23,7 @@ public final class DemoCommands {
     private final PlayCommands play;
     private final DemoLoader loader;
 
-    public DemoCommands(DemoLoader loader, Map<String, Recipe> recipes) {
+    public DemoCommands(JavaPlugin plugin, DemoLoader loader, Map<String, Recipe> recipes) {
         this.playbacks = new CurrentPlaybacks();
         this.play = new PlayCommands(this.playbacks, recipes);
         this.loader = loader;
@@ -31,6 +31,7 @@ public final class DemoCommands {
 
     public LiteralCommandNode<CommandSourceStack> build() {
         return Commands.literal("flux")
+                .requires(commandSourceStack -> commandSourceStack.getSender().hasPermission("flux.admin"))
                 .then(this.play.play("play", false))
                 .then(this.play.play("follow", true))
                 .then(control("pause", Playback::pause))
@@ -42,7 +43,23 @@ public final class DemoCommands {
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> control(String name, Consumer<Playback> action) {
-        return Commands.literal(name).executes(ctx -> this.playbacks.apply(ctx.getSource(), action));
+        return Commands.literal(name)
+                .then(Commands.argument("particleId", StringArgumentType.greedyString())
+                        .suggests((_, builder) -> {
+                            String typed = builder.getRemainingLowerCase();
+                            Collection<String> playbacks = this.playbacks.getPlaybackIds();
+                            playbacks.add("all");
+
+                            playbacks.stream()
+                                    .filter(candidate -> candidate.toLowerCase().startsWith(typed.toLowerCase()))
+                                    .forEach(builder::suggest);
+
+                            return builder.buildFuture();
+                        })
+                        .executes(ctx ->
+                                playbacks.apply(ctx.getSource(), StringArgumentType.getString(ctx, "particleId"), action)
+                        )
+                );
     }
 
     private LiteralArgumentBuilder<CommandSourceStack> list() {

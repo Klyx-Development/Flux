@@ -14,5 +14,5 @@ rootProject.name = "Flux"
 include(":common")
 include(":platform-paper")
 project(":platform-paper").projectDir = file("platform/paper")
-include(":demo-paper")
-project(":demo-paper").projectDir = file("demo/paper")
+include(":plugin-paper")
+project(":plugin-paper").projectDir = file("plugin/paper")

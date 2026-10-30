@@ -1,21 +1,25 @@
-package org.klyx.fluxtest.command;
+package org.klyx.flux.plugin.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.klyx.flux.effect.ParticleLike;
 import org.klyx.flux.effect.AdvancedParticle;
 import org.klyx.flux.effect.playback.Playback;
 import org.klyx.flux.paper.FluxPaper;
-import org.klyx.fluxtest.recipe.DemoEmitters;
-import org.klyx.fluxtest.recipe.Recipe;
+import org.klyx.flux.plugin.recipe.DemoEmitters;
+import org.klyx.flux.plugin.recipe.Recipe;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -44,31 +48,34 @@ public final class PlayCommands {
                             if (!(ctx.getSource().getSender() instanceof Player player)) return 0;
 
                             String wanted = StringArgumentType.getString(ctx, "name").trim();
-                            ParticleLike particle = FluxPaper.blueprints().get(wanted);
-                            if (particle == null) {
-                                error(player, "no particle called \"" + wanted + "\"");
-                                return 0;
-                            }
-
-                            this.playbacks.stop(player);
-                            return start(player, wanted, particle, follow);
+                            return execute(player, player.getLocation(), wanted, follow);
                         }));
     }
 
-    private int start(Player player, String name, ParticleLike particle, boolean follow) {
-        List<Player> viewers = List.of(player);
+    private int execute(Player player, Location targetLocation, String particleName, boolean follow) {
+        ParticleLike particle = FluxPaper.blueprints().get(particleName);
+        if (particle == null) {
+            error(player, "no particle called \"" + particleName + "\"");
+            return 0;
+        }
+
+        return start(player, targetLocation, particleName, particle, follow);
+    }
+
+    private int start(Player player, Location targetLocation, String name, ParticleLike particle, boolean follow) {
+        var viewers = Bukkit.getOnlinePlayers();
         Playback started;
         try {
             if (particle instanceof AdvancedParticle system) reportIgnored(player, system);
 
             started = follow ? FluxPaper.follow(particle, player, heightOffset(name), viewers)
-                    : FluxPaper.play(particle, inFront(player, particle), viewers);
+                    : FluxPaper.play(particle, targetLocation, viewers);
         } catch (IllegalArgumentException e) {
             error(player, e.getMessage());
             return 0;
         }
 
-        this.playbacks.replace(player, started);
+        this.playbacks.play(name, started);
         return Command.SINGLE_SUCCESS;
     }
 
@@ -80,13 +87,6 @@ public final class PlayCommands {
         return recipe == null ? DEFAULT_HEIGHT : recipe.heightOffset();
     }
 
-    private static Location inFront(Player player, ParticleLike particle) {
-        boolean system = particle instanceof AdvancedParticle;
-
-        return player.getLocation()
-                .add(player.getLocation().getDirection().multiply(system ? 4 : 5))
-                .add(0, system ? 0.5 : 1.5, 0);
-    }
 
     private static void reportIgnored(Player player, AdvancedParticle system) {
         if (system.ignored().isEmpty()) return;
@@ -97,7 +97,7 @@ public final class PlayCommands {
                 player.sendMessage(Component.text("  " + ignored, NamedTextColor.GRAY)));
     }
 
-    private static void error(Player player, String message) {
-        player.sendMessage(Component.text(message, NamedTextColor.RED));
+    private static void error(CommandSender sender, String message) {
+        sender.sendMessage(Component.text(message, NamedTextColor.RED));
     }
 }

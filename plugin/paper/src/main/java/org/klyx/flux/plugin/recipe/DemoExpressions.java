@@ -1,4 +1,4 @@
-package org.klyx.fluxtest.recipe;
+package org.klyx.flux.plugin.recipe;
 
 import org.klyx.flux.expr.Expression;
 import org.klyx.flux.expr.ExpressionException;

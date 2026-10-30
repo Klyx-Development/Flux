@@ -1,4 +1,4 @@
-package org.klyx.fluxtest;
+package org.klyx.flux.plugin;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

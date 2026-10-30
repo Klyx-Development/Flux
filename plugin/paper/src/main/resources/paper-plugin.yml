@@ -1,0 +1,6 @@
+name: Flux
+version: '1.0'
+main: org.klyx.flux.plugin.FluxPlugin
+description: Plugin for Flux, used to check out the effects and what Flux is capable of!
+authors: [ "Asleepp" ]
+api-version: '26.2'

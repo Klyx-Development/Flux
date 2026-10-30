@@ -1,4 +1,4 @@
-package org.klyx.fluxtest.recipe.impl;
+package org.klyx.flux.plugin.recipe.impl;
 
 import org.klyx.flux.expr.Expression;
 import org.klyx.flux.sim.emission.Direction;
@@ -7,11 +7,11 @@ import org.klyx.flux.sim.spec.DisplayKind;
 import org.klyx.flux.sim.spec.EmitterSpec;
 import org.klyx.flux.sim.spec.Parametric;
 import org.klyx.flux.sim.spec.ParticleSpec;
-import org.klyx.fluxtest.recipe.Recipe;
+import org.klyx.flux.plugin.recipe.Recipe;
 
 import java.util.List;
 
-import static org.klyx.fluxtest.recipe.DemoExpressions.expr;
+import static org.klyx.flux.plugin.recipe.DemoExpressions.expr;
 
 public final class CrownRecipe {
     public static Recipe create() {

@@ -1,4 +1,4 @@
-package org.klyx.fluxtest.command;
+package org.klyx.flux.plugin.command;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
