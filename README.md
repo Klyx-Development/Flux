@@ -15,8 +15,9 @@ Currently available:
 
 ### Requirements
 - Java 25+
-- Paper 26.2
+- Paper 26.3
 
+(Proper version support will come in a later update)
 # Installation
 ### Paper
 
@@ -45,14 +46,15 @@ public class MyPlugin extends JavaPlugin {
 ```kotlin
 repositories {
     mavenLocal()
+    maven("https://repo.klyx.org/releases")
 }
 
 dependencies {
     // Common (required)
-    implementation("org.klyx.flux:common:1.0.2")
+    implementation("org.klyx.flux:common:1.0.3")
 
     // Paper
-    implementation("org.klyx.flux:paper:1.0.2")
+    implementation("org.klyx.flux:paper:1.0.3")
 }
 ```
 
@@ -62,14 +64,14 @@ dependencies {
 <dependency>
   <groupId>org.klyx.flux</groupId>
   <artifactId>common</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 
 <!-- Paper -->
 <dependency>
   <groupId>org.klyx.flux</groupId>
   <artifactId>paper</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
 </dependency>
 ```
 
